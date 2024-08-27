@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users', 'id');
             $table->foreignId('updated_by')->nullable()->constrained('users', 'id');
             $table->timestamps();
+            $table->boolean('is_deleted')->default(false);
 
             $table->index(['title', 'origin', 'destination', 'created_by']);
         });
