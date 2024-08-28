@@ -45,7 +45,7 @@ class TripController extends Controller
 
             return $this->createdResponse($result, 'Successfully.', 'Success to create your trip plan.');
         } catch (ValidationException $e) {
-            return $this->sendError(null, $e->getMessage(), $e->errors());
+            return $this->sendError(null, $e->getMessage(), $e->errors(), 400);
         } catch (\Throwable $th) {
             return $this->sendError(null, null, $th->getMessage());
         }
@@ -67,7 +67,7 @@ class TripController extends Controller
 
             return $this->sendResponse($result, 'Successfully.', 'Success to update your trip plan.');
         } catch (ValidationException $e) {
-            return $this->sendError(null, $e->getMessage(), $e->errors());
+            return $this->sendError(null, $e->getMessage(), $e->errors(), 400);
         } catch (\Throwable $th) {
             return $this->sendError(null, null, $th->getMessage());
         }
