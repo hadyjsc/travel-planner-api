@@ -3,23 +3,28 @@
 namespace App\UseCases;
 
 use App\Interfaces\TripInterface;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Models\Trip;
 use App\Models\TripLog;
 
 class TripUseCase implements TripInterface {
+    protected $CACHE_KEY = 'tripsGetList';
     public function getList(int $page = 1, int $perPage = 15, string $search = null) {
-        $query = Trip::query();
-
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')->orWhere('description', 'like', '%' . $search . '%');
-            });
-        }
-
-        $query->where('is_deleted', false);
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        $trips = Cache::remember($this->CACHE_KEY, 3600, function (int $page = 1, int $perPage = 15, string $search = null) {
+            $query = Trip::query();
+    
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%')->orWhere('description', 'like', '%' . $search . '%');
+                });
+            }
+    
+            $query->where('is_deleted', false);
+    
+            return $query->paginate($perPage, ['*'], 'page', $page);
+        });
+        return $trips;
     }
 
     public function insert(array $payload) {
@@ -44,6 +49,8 @@ class TripUseCase implements TripInterface {
             $log->action_by = 1; // auth()->id();
             $log->action_at = now();
             $log->save();
+
+            Cache::forget($this->CACHE_KEY);
     
             return $model;
         });
@@ -69,6 +76,8 @@ class TripUseCase implements TripInterface {
             $log->action_at = now();
             $log->save();
 
+            Cache::forget($this->CACHE_KEY);
+
             return $model;
         });
     }
@@ -91,6 +100,8 @@ class TripUseCase implements TripInterface {
             $log->action_by = 1; // auth()->id();
             $log->action_at = now();
             $log->save();
+
+            Cache::forget($this->CACHE_KEY);
 
             return $model;
         });
