@@ -11,9 +11,9 @@ class Trip extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'origin', 'destination', 'schedule_start_date', 'schedule_end_date', 'type', 'description', 'created_by', 'created_at'];
+    protected $fillable = ['id', 'title', 'origin', 'destination', 'schedule_start_date', 'schedule_end_date', 'type', 'description', 'created_by', 'created_at'];
 
-    protected $hidden = ['id', 'updated_at', 'updated_by', 'is_deleted'];
+    protected $hidden = ['updated_at', 'updated_by', 'is_deleted'];
 
     /**
      * Get all of the users for the Trip

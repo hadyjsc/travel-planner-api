@@ -19,7 +19,7 @@ class LoginTest extends TestCase
         $email = 'kelepon@kueenak.com';
         $pass = 'kuekelep0n';
 
-         $user = User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Kelepon Merah',
             'email' => $email,
             'password' => Hash::make($pass),
@@ -64,7 +64,18 @@ class LoginTest extends TestCase
      */
     public function test_login_validation_password_required() : void 
     {
-        
+        $response = $this->postJson('/api/login', [
+            'email' => 'kelepon@kueenak.com',
+        ]);
+
+        $response->assertStatus(400)->assertJsonStructure([
+            'success',
+            'messageTitle',
+            'message',
+            'data' => [ 'password' ]
+        ]);
+
+        $response->assertSee('The password field is required.');
     }
 
     /**
@@ -73,7 +84,23 @@ class LoginTest extends TestCase
      */
     public function test_login_invalid_username_and_password() : void 
     {
-        
+        $email = 'kelepon@kueenak.com';
+        $pass = 'kuekelep0n';
+
+        $user = User::factory()->create([
+            'name' => 'Kelepon Merah',
+            'email' => $email,
+            'password' => Hash::make($pass),
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => $email,
+            'password' => 'keleponaja',
+        ]);
+
+        $response->assertStatus(401)->assertJson([
+            'message' => 'Invalid login details.',
+        ]);
     }
 
     /**
@@ -82,6 +109,21 @@ class LoginTest extends TestCase
      */
     public function test_login_username_with_invalid_email() : void
     {
+        $response = $this->postJson('/api/login', [
+            'email' => 'gagalmakankelepon',
+            'password' => 'kuekelep0n',
+        ]);
+
+        $response->assertStatus(400)->assertJsonStructure([
+            'success',
+            'messageTitle',
+            'message',
+            'data' => [ 'email' ]
+        ]);
+
+        $response->assertStatus(400)->assertJson([
+            'message' => 'The email field must be a valid email address.',
+        ]);
 
     }
 }
